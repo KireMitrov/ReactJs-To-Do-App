@@ -1,10 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ToDoList from './ToDoList';
 
 function ToDoInput() {
-    let [inputValue, setInputValue] = useState('');
-    let [toDoList, setToDoList] = useState([]);
-    let [complete, setComplete] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+    const [toDoList, setToDoList] = useState(() => {
+        const savedToDoList = JSON.parse(localStorage.getItem('todolist'));
+        return savedToDoList || [];
+    });
+    let complete = false;
+
+
+    //local storage handle
+    useEffect(() => {
+        localStorage.setItem('todolist', JSON.stringify(toDoList));
+    }, [toDoList])
 
     // adding Todo to the list
     function idGenerator() {
@@ -26,22 +35,22 @@ function ToDoInput() {
             }
         }
         setToDoList([...toDoList, todo]);
+        // setLocalStorage();
     }
 
     //delete Todo
     function deleteToDo(e) {
         setToDoList(toDoList.filter(toDo => toDo.id !== e.target.id));
+        // setLocalStorage();
     }
 
     // complete Todo
-    function handleComplete() {
-        setComplete(!complete);
-    }
 
     function completeToDo(e) {
         let todo = toDoList.find((toDo) => toDo.id === e.target.id);
-        todo.complete = complete;
-        handleComplete();
+        todo.complete = !todo.complete;
+        setToDoList([...toDoList]);
+        // setLocalStorage();
     }
 
     //edit to do 
@@ -49,6 +58,7 @@ function ToDoInput() {
         let editToDo = e.target.parentElement.firstChild;
         setInputValue(editToDo.value);
         setToDoList(toDoList.filter(toDo => toDo.id !== e.target.id));
+        // setLocalStorage();
     }
 
 
